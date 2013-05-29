@@ -19,16 +19,6 @@ C8O = {
 		}
 		C8O._define.recall_params[parameter_name] = parameter_value;
 	},
-	
-	appendValue : function (data, key, value) {
-		if (C8O.isUndefined(data[key])) {
-			data[key] = value;
-		} else if ($.isArray(data[key])) {
-			data[key].push(value);
-		} else {
-			data[key] = [data[key], value];
-		}
-	},
 		
 	call : function (data) {
 		C8O._loadingStart();
@@ -37,11 +27,14 @@ C8O = {
 		} else if (C8O.isUndefined(data)) {
 			data = {};
 		} else if (!$.isPlainObject(data) && $(data).is("form")) {
-			data = C8O.formToData($form);
+			data = C8O._parseQuery({}, $(data).serialize());
 		}
 		
-		C8O._retrieve_vars(data);
-		
+		for (key in C8O.vars) {
+			if (!C8O.isUndefined(data["__" + key])) {
+				C8O.vars[key] = C8O._remove(data, "__" + key);
+			}
+		}
 		for (key in C8O._define.recall_params) {
 			if (C8O._define.recall_params.hasOwnProperty(key)) {
 				if (!C8O.isUndefined(data[key])) {
@@ -56,20 +49,6 @@ C8O = {
 		}
 		
 		C8O._call(data);
-	},
-	
-	formToData : function ($form, data) {
-		if (!$form.jquery) {
-			$form = $($form);
-		}
-		if (C8O.isUndefined(data)) {
-			data = {};
-		}
-		var formArray = ($form.jquery ? $form : $($form)).serializeArray();
-		for (var i in formArray) {
-			C8O.appendValue(data, formArray[i].name, formArray[i].value);
-		}
-		return data;
 	},
 	
 	getLastCallParameter : function (key) {
@@ -95,83 +74,24 @@ C8O = {
 	_define : {
 		hooks : {},
 		last_call_params : {},
-		pendingXhrCpt : 0,
-		recall_params : {__context : "", __connector : ""},
-		re_plus : new RegExp("\\+", "g")
+		recall_params : {__context : "", __connector : ""}
 	},
 	
 	_call : function (data) {
 		C8O._define.last_call_params = data;
 		if (C8O._hook("call", data)) {
-			var jqXHR = $.ajax({
+			$.ajax({
 				data : data,
 				dataType : "xml",
-				success : C8O._onSuccess,
+				success : function (xml, status, xhr) {
+					if (C8O._hook("xml_response", xml)) {
+						C8O._loadingStop();
+					}
+				},
 				type : C8O.vars.ajax_method,
 				url : "../../" + C8O.vars.requester_prefix + ".xml"
 			});
-			jqXHR.C8O_data = data;
-			C8O._define.pendingXhrCpt++;
 		}
-	},
-	
-	_onSuccess : function (xml, status, jqXHR) {
-		if (--C8O._define.pendingXhrCpt <= 0) {
-			C8O._define.pendingXhrCpt = 0;
-			C8O._loadingStop();
-		}
-		C8O._hook("xml_response", xml, jqXHR.C8O_data);
-	},
-	
-	_retrieve_vars : function (data) {
-		for (key in C8O.vars) {
-			if (!C8O.isUndefined(data["__" + key])) {
-				C8O.vars[key] = C8O._remove(data, "__" + key);
-			}
-		}
-	},
-	
-	_findAndSelf : function ($elt, selector) {
-		return $elt.filter(selector).add($elt.find(selector));
-	},
-	
-	_getAttributes : function (element) {
-		if (element.jquery) {
-			return element.length ?
-					C8O._getAttributes(element[0]) :
-					{};
-		} else {
-			var attributes = {};
-			for (var i = 0 ; i < element.attributes.length ; i++) {
-				attributes[element.attributes[i].nodeName] = element.attributes[i].nodeValue
-			}
-			return attributes;
-		}
-	},
-	
-	_getFunction : function (functionObject) {
-		try {
-			if (typeof(functionObject) == "function") {
-				return functionObject;
-			} else {
-				var parts = functionObject.split(".");
-				var fn = window;
-				for (var i in parts) {
-					fn = fn[parts[i]];
-				}
-				
-				return typeof(fn) == "function" ? fn : null;
-			}
-		} catch (e) {
-			return null;
-		}
-	},
-	
-	_getQuery : function () {
-		var l = window.location,
-			q = l.search.length > 0 ? l.search.substring(1) : "",
-			h = l.hash.length > 0 ? l.hash.substring(1) : "";
-		return (q.length > 0 && h.length > 0) ? (q + "&" + h) : (q.length > 0 ? q : h);
 	},
 	
 	_hook : function (name) {
@@ -215,19 +135,21 @@ C8O = {
 				key = (id > 0)?vars[i].substring(0, id):vars[i];
 				value = "";
 				if (id > 0) {
-					value = vars[i].substring(id + 1);
-					if (value.length) {
-						value = value.replace(C8O._define.re_plus, " ");
+					try {
+						value = decodeURIComponent(vars[i].substring(id + 1));
+					}catch (err1) {
 						try {
-							value = decodeURIComponent(value);
-						} catch (err1) {
-							try {
-								value = unescape(value);
-							} catch (err2) {}
-						}
+							value = unescape(vars[i].substring(id + 1));
+						}catch (err2) {}
 					}
 				}
-				C8O.appendValue(data, key, value);
+				if (C8O.isUndefined(data[key])) {
+					data[key] = value;
+				} else if ($.isArray(data[key])) {
+					data[key].push(value);
+				} else {
+					data[key] = [data[key]].concat([value]);
+				}
 			}
 		}
 		return data;
