@@ -21,11 +21,9 @@
  */
 
 C8O._init_rsa = function (params) {
-	C8O.addHook("_call_rsa", function (data) {
-		C8O.log.trace("c8o.core: make RSA encryption");
-		return {__encoded: encrypt("ts=" + new Date().getTime() + "&" + $.param(data), C8O._define.publickey)};
+	C8O.addHook("call", function (data) {
+		C8O._obj_replace(data, {__encoded: encrypt("ts=" + new Date().getTime() + "&" + $.param(data), C8O._define.publickey)});
 	});
-	C8O._define.publickey = "";
 
 	$.ajax({
 		dataType: "text",
@@ -34,7 +32,7 @@ C8O._init_rsa = function (params) {
 			C8O._define.publickey = setKeyPair(split[0], split[1], split[2]);
 			C8O._init(params);
 		},
-		url: window.location.href.replace(new RegExp("/projects/.*"), "/rsa/publickey")
+		url: "../../rsa/publickey"
 	});
 }
 
