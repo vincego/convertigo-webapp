@@ -1,0 +1,44 @@
+sudo: required
+services:
+- docker
+git:
+  depth: 5
+language: generic
+env:
+  global:
+  - CACHE_DOCKER=$HOME/.cache/docker
+  - CACHE_DOCKER_C8O=$CACHE_DOCKER/convertigo
+cache:
+  directories:
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper/"
+  - "$HOME/.cache/wrapper/"
+  - "$CACHE_DOCKER"
+before_install:
+- if [ -f ${CACHE_DOCKER_C8O} ]; then gunzip -c ${CACHE_DOCKER_C8O} | docker load;
+  fi
+install:
+- mkdir -p $CACHE_DOCKER
+- docker pull convertigo/docker-build:latest
+- if [ ! -f ${CACHE_DOCKER_C8O} ]; then docker save convertigo/docker-build:latest
+  | gzip > ${CACHE_DOCKER_C8O}; fi
+before_script:
+- docker run --rm -v $PWD:/mnt -v $HOME:/root -w /mnt convertigo/docker-build git
+  lfs pull
+script:
+- docker run --rm -v $PWD:/mnt -v $HOME:/root -w /mnt convertigo/docker-build ./gradlew
+  $GRADLE_ARGS assemble
+before_cache:
+- rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+deploy:
+  provider: s3
+  bucket: convertigo-download
+  acl: public_read
+  region: us-east-1
+  local_dir: build/libs
+  upload-dir: build/beta/webapp
+  access_key_id:
+    secure: "oO/hp/pGtEq2wzkjYThKZ/iqZfu13q1MSincQng7cSLwy2Mb2P5cZ4dYTlQY/LPwpZj2XvV5d2N5Bd1MPI9Vbpjj9Jjt7OmRTcBj1SzV4H6foQF9nJTm476ADSUOuyqt3bvrRfDfhaKBWSbXjLOWBeZRBTAC8orulR7Aig5W83BAsLu6gjyYG64+teKCDRzoN0J1uild3Uvl7YYTDaN1cTPC1mMhxUWpMfpMmxK5hA3vkCDKcuCYiOq71oSzeITyIFy2t5U86HmqhjYWSaQR1NhYFBUr/u7IVE0h+yIE83ZK7asO6YuJv60/SFY15Ea48iRW0arIpqz/eV2z+gxr63AlLl7SyhlbwUMIwrwtBCYZIzN1XDVykw95kfPIdgKq6KoUFWfBAWoACtUTB2aLENfc3QTCQNhOgYKKp4liJTJJiZOW/4Atox4YGKoYLIZwxUehxqB+WpLHx7RxMqjGue8Y3m4gMSmQWKxPVh0G6874+NQZTf9NuYG2GbBWbWf9qXNvaQRWxX9+EIQ60Bf6cE6x77YkJj5/jlvO7Kh/zVsF8Yk5ge/EH4oHAmn7+dGuqVIJqjXX8ZgxqLWMhSFfmLeodqpqc+j5MuTmUzR0Y9iGbYb+WCARlfreGi4FQCtNKdHJfQSf1jw2TMl+N6Sz8oJSK0f2+P4OwNgazYvoPeM="
+  secret_access_key:
+    secure: "cNRVysLqGilV6xvyoGGdMkp+ap650ZqyKHs5VYNSVRjQEPOaVZM9JiUW/25gBeNB6vGVcxr81S6nzMRTVADu1NC/evMl8It4gS/+RFUdga5JIcW8rax1F9/U16KJiq19dZgZKrd20iCkQbICHNmqK5Vvf+nJ1vKCZjzI0F86RGdjaaW0SojKcQFbppgYHarPUgacS9TBmVmyOe8Tdt1a2V70cAsMmYNGyt0prJoeB3/Bacyr2bOYFQqUsLcLg61KjSDCUcUKQE1fuQ9kXEBfV+vuPVGzEPhTtnp2zbIhB2vSNElaudWV41c4hb1wsW6xltHptBj9V/sAuNGzcjs9SJZBCvmCIbiZzDpM9j1gKxPET+RzXgIQR9a8dmztAatcMN3CqxMCKUdId1X99TQPUqd7zoNDNqyCt+y3G4pcx04b3mOTshl0R+yukLR6Zs5gsDkD1ga+PRPZUjoeTyqTeM57kxf0RTGxfXtZrLDPTHDlA2pxUrlPw/X3Y8aJmn5aidjFqOOkH3z2YwPk4kdFq50GmRAmsBCv9MoAfvlD34wrCH0ctJdqnBLoQUjgcACes9HZKIcLta++eyn9vTD2MKi4f0ZjYH7M0xOYZKB2FDEguYwzaR4hgsj/XtkRC+V85jJDMnUpfOXZ7e8WICgtKZzAgHfc1210mM9B0O2Hwrg="
