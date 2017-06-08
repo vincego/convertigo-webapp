@@ -10,24 +10,20 @@ env:
   - CACHE_DOCKER_C8O=$CACHE_DOCKER/convertigo
 cache:
   directories:
-  - "$HOME/.gradle/caches/"
-  - "$HOME/.gradle/wrapper/"
-  - "$HOME/.cache/wrapper/"
-  - "$CACHE_DOCKER"
+  - $HOME/.gradle/caches/
+  - $HOME/.gradle/wrapper/
+  - $HOME/.cache/wrapper/
+  - $CACHE_DOCKER
 before_install:
-- if [ -f ${CACHE_DOCKER_C8O} ]; then gunzip -c ${CACHE_DOCKER_C8O} | docker load;
-  fi
+- if [ -f ${CACHE_DOCKER_C8O} ]; then gunzip -c ${CACHE_DOCKER_C8O} | docker load; fi
 install:
 - mkdir -p $CACHE_DOCKER
 - docker pull convertigo/docker-build:latest
-- if [ ! -f ${CACHE_DOCKER_C8O} ]; then docker save convertigo/docker-build:latest
-  | gzip > ${CACHE_DOCKER_C8O}; fi
+- if [ ! -f ${CACHE_DOCKER_C8O} ]; then docker save convertigo/docker-build:latest | gzip > ${CACHE_DOCKER_C8O}; fi
 before_script:
-- docker run --rm -v $PWD:/mnt -v $HOME:/root -w /mnt convertigo/docker-build git
-  lfs pull
+- docker run --rm -v $PWD:/mnt -v $HOME:/root -w /mnt convertigo/docker-build git lfs pull
 script:
-- docker run --rm -v $PWD:/mnt -v $HOME:/root -w /mnt convertigo/docker-build ./gradlew
-  $GRADLE_ARGS assemble
+- docker run --rm -v $PWD:/mnt -v $HOME:/root -w /mnt convertigo/docker-build ./gradlew $GRADLE_ARGS assemble
 before_cache:
 - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
 - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
@@ -39,6 +35,8 @@ deploy:
   local_dir: build/libs
   upload-dir: build/beta/webapp
   access_key_id:
-    secure: "oO/hp/pGtEq2wzkjYThKZ/iqZfu13q1MSincQng7cSLwy2Mb2P5cZ4dYTlQY/LPwpZj2XvV5d2N5Bd1MPI9Vbpjj9Jjt7OmRTcBj1SzV4H6foQF9nJTm476ADSUOuyqt3bvrRfDfhaKBWSbXjLOWBeZRBTAC8orulR7Aig5W83BAsLu6gjyYG64+teKCDRzoN0J1uild3Uvl7YYTDaN1cTPC1mMhxUWpMfpMmxK5hA3vkCDKcuCYiOq71oSzeITyIFy2t5U86HmqhjYWSaQR1NhYFBUr/u7IVE0h+yIE83ZK7asO6YuJv60/SFY15Ea48iRW0arIpqz/eV2z+gxr63AlLl7SyhlbwUMIwrwtBCYZIzN1XDVykw95kfPIdgKq6KoUFWfBAWoACtUTB2aLENfc3QTCQNhOgYKKp4liJTJJiZOW/4Atox4YGKoYLIZwxUehxqB+WpLHx7RxMqjGue8Y3m4gMSmQWKxPVh0G6874+NQZTf9NuYG2GbBWbWf9qXNvaQRWxX9+EIQ60Bf6cE6x77YkJj5/jlvO7Kh/zVsF8Yk5ge/EH4oHAmn7+dGuqVIJqjXX8ZgxqLWMhSFfmLeodqpqc+j5MuTmUzR0Y9iGbYb+WCARlfreGi4FQCtNKdHJfQSf1jw2TMl+N6Sz8oJSK0f2+P4OwNgazYvoPeM="
+    secure: bOA+aQMg6y4Qcc6EfUHg3zSKjWI2GlOAH5+55CA8YaHmTZLtmkn7FQzLh9V36tDUigCalUssFXxEh8ql5yu/L6Ama8GHJJyX5BZW6umu+GgYiGksgw81RJKplYzNT1ZoB+F0aZjyBg3LdNudzujGfRu/cge5CNrUt+4mKkEXVe0Jzhr3ZM1DPhohMmZrelsBtfLhzDIQjCjrcnKELM0yf3FghHNqfREwbwl3kHyHvCI0k370xYoeka20eYZUyZu0nkgO4KPveCHS0lLBInAmrH38rzTuO84KjKouD0jctM6SFmNGKv0bNQlqhEVlg+Us+K8Y5EhHRvM+UGIJJMP4D3z3lg+z/zPuNy+aYaMrGqsr7H/HmGbg0AsoLHpuEoSs/7DZz56Fm1IqMjWKBe4nLsAOsH1/EUDIB4TD9fO9WyGfHkeT11rnIm+qFjn5YIB3mv9dN/gkwV+3+ILagi7R6IGx+O3GZakd/65rIz8PcvJ7QV6Arxl+H14k4Fr7oIbxztog/yDZLDhQkmCPyrhLV/JYrtCmgCqkIJC8VBB3tXKv+Kwpv/4J+XgqZZgthHw3FpMPAE4auG68X4t6YnwDWnBdr7AHqqOBWbrg0jAd80PuJ88NZazJP0xq/MxE6fCimNTnw1KGKJjgRL5LexVFU2OP9r+TCoRAsRqHuOFlgcw=
   secret_access_key:
-    secure: "cNRVysLqGilV6xvyoGGdMkp+ap650ZqyKHs5VYNSVRjQEPOaVZM9JiUW/25gBeNB6vGVcxr81S6nzMRTVADu1NC/evMl8It4gS/+RFUdga5JIcW8rax1F9/U16KJiq19dZgZKrd20iCkQbICHNmqK5Vvf+nJ1vKCZjzI0F86RGdjaaW0SojKcQFbppgYHarPUgacS9TBmVmyOe8Tdt1a2V70cAsMmYNGyt0prJoeB3/Bacyr2bOYFQqUsLcLg61KjSDCUcUKQE1fuQ9kXEBfV+vuPVGzEPhTtnp2zbIhB2vSNElaudWV41c4hb1wsW6xltHptBj9V/sAuNGzcjs9SJZBCvmCIbiZzDpM9j1gKxPET+RzXgIQR9a8dmztAatcMN3CqxMCKUdId1X99TQPUqd7zoNDNqyCt+y3G4pcx04b3mOTshl0R+yukLR6Zs5gsDkD1ga+PRPZUjoeTyqTeM57kxf0RTGxfXtZrLDPTHDlA2pxUrlPw/X3Y8aJmn5aidjFqOOkH3z2YwPk4kdFq50GmRAmsBCv9MoAfvlD34wrCH0ctJdqnBLoQUjgcACes9HZKIcLta++eyn9vTD2MKi4f0ZjYH7M0xOYZKB2FDEguYwzaR4hgsj/XtkRC+V85jJDMnUpfOXZ7e8WICgtKZzAgHfc1210mM9B0O2Hwrg="
+    secure: iN1prLuD9zVjvXL9QUhfKFpRdlpxPrI94yhOyMTHe9mkWBlgUefgJDsk9JORaPHWvpDXUZ8yz9mgsB457m1QmiPhm4g2xpe3CHWxqhukdsmQg99Nwj01qsYO27frTGBbCtg9WWhVQmmXlUKfJllxsHbnPVpQlQhamIh6L/6B04fs1okNMURCzxBmI4ZI2CfF3+8WtQnSEupdP9QVTkNdOIRt5RDhJtZQ7ZFr8HFzq65zBRan1Pm2StT/sAzXLnHJoSCOi6S1Mu3XrBVrX3jPSoGvRqfkBD9DxcCMjfDq7On9o8hBmbOhVz2w6LNk2eiWXVV0ke9gDc8kNckUtof1E1pfY2oJPer56rOfgZIMLdr2IIAhiDYQAD1bzvJwXhho9SUaR+vOt8DcKIQQYezFqmGOeF/24N4jNi3RKGGcRbookw+uF4+yo9NOeC/tp1gapNAepKEpp8Xzwxhujz3y352S7fGbrEOiBGmmb9P8+XZUfag/a8b7gks+PYgUuMXh7OrXS3K3P39q2fc4S8VN2NGQ2ziNdHLEtAq2e9HW/EyrrUZg9CJu7sKFNh+A7nYZB8XP0gbYKh6FIBV61qhN52G21I/DdmSeLl/yirgWmoSK/Nte/PzImDXbqrRhyBIOzfu1EbpKWlq1TKpUXv3QcNWthfNr8pQVAU4drvzrFZg=
+after_deploy:
+- curl -v -X POST https://cloud.docker.com/api/build/v1/source/404dc1c7-ab51-41db-ad6e-e15ea7701013/trigger/25657f18-3e4c-41ea-8f16-70f055b5ce36/call/
