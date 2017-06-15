@@ -23,7 +23,7 @@ install:
 before_script:
 - docker run --rm -v $PWD:/mnt -v $HOME:/root -w /mnt convertigo/docker-build git lfs pull
 script:
-- docker run --rm -v $PWD:/mnt -v $HOME:/root -w /mnt convertigo/docker-build ./gradlew $GRADLE_ARGS assemble
+- docker run --rm -v $PWD:/mnt -v $HOME:/root -w /mnt convertigo/docker-build ./gradlew $GRADLE_ARGS --refresh-dependencies assemble
 before_cache:
 - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
 - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
@@ -39,4 +39,4 @@ deploy:
   secret_access_key:
     secure: iN1prLuD9zVjvXL9QUhfKFpRdlpxPrI94yhOyMTHe9mkWBlgUefgJDsk9JORaPHWvpDXUZ8yz9mgsB457m1QmiPhm4g2xpe3CHWxqhukdsmQg99Nwj01qsYO27frTGBbCtg9WWhVQmmXlUKfJllxsHbnPVpQlQhamIh6L/6B04fs1okNMURCzxBmI4ZI2CfF3+8WtQnSEupdP9QVTkNdOIRt5RDhJtZQ7ZFr8HFzq65zBRan1Pm2StT/sAzXLnHJoSCOi6S1Mu3XrBVrX3jPSoGvRqfkBD9DxcCMjfDq7On9o8hBmbOhVz2w6LNk2eiWXVV0ke9gDc8kNckUtof1E1pfY2oJPer56rOfgZIMLdr2IIAhiDYQAD1bzvJwXhho9SUaR+vOt8DcKIQQYezFqmGOeF/24N4jNi3RKGGcRbookw+uF4+yo9NOeC/tp1gapNAepKEpp8Xzwxhujz3y352S7fGbrEOiBGmmb9P8+XZUfag/a8b7gks+PYgUuMXh7OrXS3K3P39q2fc4S8VN2NGQ2ziNdHLEtAq2e9HW/EyrrUZg9CJu7sKFNh+A7nYZB8XP0gbYKh6FIBV61qhN52G21I/DdmSeLl/yirgWmoSK/Nte/PzImDXbqrRhyBIOzfu1EbpKWlq1TKpUXv3QcNWthfNr8pQVAU4drvzrFZg=
 after_deploy:
-- curl -v -X POST https://cloud.docker.com/api/build/v1/source/404dc1c7-ab51-41db-ad6e-e15ea7701013/trigger/25657f18-3e4c-41ea-8f16-70f055b5ce36/call/
+- eval $TRIGGER_DOCKER
