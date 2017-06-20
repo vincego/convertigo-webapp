@@ -23,20 +23,8 @@ install:
 before_script:
 - docker run --rm -v $PWD:/mnt -v $HOME:/root -w /mnt convertigo/docker-build git lfs pull
 script:
-- docker run --rm -v $PWD:/mnt -v $HOME:/root -w /mnt convertigo/docker-build ./gradlew $GRADLE_ARGS --refresh-dependencies assemble
+- docker run --rm -v $PWD:/mnt -v $HOME:/root -w /mnt convertigo/docker-build ./gradlew $GRADLE_ARGS --refresh-dependencies publish
+- eval $TRIGGER_DOCKER
 before_cache:
 - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
 - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-deploy:
-  provider: s3
-  bucket: convertigo-download
-  acl: public_read
-  region: us-east-1
-  local_dir: build/libs
-  upload-dir: build/beta/webapp
-  access_key_id:
-    secure: bOA+aQMg6y4Qcc6EfUHg3zSKjWI2GlOAH5+55CA8YaHmTZLtmkn7FQzLh9V36tDUigCalUssFXxEh8ql5yu/L6Ama8GHJJyX5BZW6umu+GgYiGksgw81RJKplYzNT1ZoB+F0aZjyBg3LdNudzujGfRu/cge5CNrUt+4mKkEXVe0Jzhr3ZM1DPhohMmZrelsBtfLhzDIQjCjrcnKELM0yf3FghHNqfREwbwl3kHyHvCI0k370xYoeka20eYZUyZu0nkgO4KPveCHS0lLBInAmrH38rzTuO84KjKouD0jctM6SFmNGKv0bNQlqhEVlg+Us+K8Y5EhHRvM+UGIJJMP4D3z3lg+z/zPuNy+aYaMrGqsr7H/HmGbg0AsoLHpuEoSs/7DZz56Fm1IqMjWKBe4nLsAOsH1/EUDIB4TD9fO9WyGfHkeT11rnIm+qFjn5YIB3mv9dN/gkwV+3+ILagi7R6IGx+O3GZakd/65rIz8PcvJ7QV6Arxl+H14k4Fr7oIbxztog/yDZLDhQkmCPyrhLV/JYrtCmgCqkIJC8VBB3tXKv+Kwpv/4J+XgqZZgthHw3FpMPAE4auG68X4t6YnwDWnBdr7AHqqOBWbrg0jAd80PuJ88NZazJP0xq/MxE6fCimNTnw1KGKJjgRL5LexVFU2OP9r+TCoRAsRqHuOFlgcw=
-  secret_access_key:
-    secure: iN1prLuD9zVjvXL9QUhfKFpRdlpxPrI94yhOyMTHe9mkWBlgUefgJDsk9JORaPHWvpDXUZ8yz9mgsB457m1QmiPhm4g2xpe3CHWxqhukdsmQg99Nwj01qsYO27frTGBbCtg9WWhVQmmXlUKfJllxsHbnPVpQlQhamIh6L/6B04fs1okNMURCzxBmI4ZI2CfF3+8WtQnSEupdP9QVTkNdOIRt5RDhJtZQ7ZFr8HFzq65zBRan1Pm2StT/sAzXLnHJoSCOi6S1Mu3XrBVrX3jPSoGvRqfkBD9DxcCMjfDq7On9o8hBmbOhVz2w6LNk2eiWXVV0ke9gDc8kNckUtof1E1pfY2oJPer56rOfgZIMLdr2IIAhiDYQAD1bzvJwXhho9SUaR+vOt8DcKIQQYezFqmGOeF/24N4jNi3RKGGcRbookw+uF4+yo9NOeC/tp1gapNAepKEpp8Xzwxhujz3y352S7fGbrEOiBGmmb9P8+XZUfag/a8b7gks+PYgUuMXh7OrXS3K3P39q2fc4S8VN2NGQ2ziNdHLEtAq2e9HW/EyrrUZg9CJu7sKFNh+A7nYZB8XP0gbYKh6FIBV61qhN52G21I/DdmSeLl/yirgWmoSK/Nte/PzImDXbqrRhyBIOzfu1EbpKWlq1TKpUXv3QcNWthfNr8pQVAU4drvzrFZg=
-after_deploy:
-- eval $TRIGGER_DOCKER
