@@ -41,4 +41,8 @@ dependencies {
 	compileOnly 'org.apache.tomcat.embed:tomcat-embed-core:7.0.78'
 	compileOnly 'org.apache.tomcat:tomcat-dbcp:7.0.78'
 	compileOnly 'org.eclipse.swt:org.eclipse.swt.gtk.linux.x86_64:4.3@jar'
+	compile 'com.convertigo.lib:qrcode:2010.04.22'
+	runtime 'org.mariadb.jdbc:mariadb-java-client:[2,)'
+	runtime 'org.postgresql:postgresql:[42,)'
+	runtime 'net.sourceforge.jtds:jtds:[1.3,)'
 }
