@@ -16,7 +16,7 @@ jobs:
          command: ./gradlew $GRADLE_ARGS --parallel --refresh-dependencies publish
      - run:
          name: Trigger docker build
-         command: "curl -X POST -u $CIRCLECI_TOKEN: https://circleci.com/api/v1.1/project/github/convertigo/docker/tree/master"
+         command: "curl -X POST -u $CIRCLECI_TOKEN: https://circleci.com/api/v1.1/project/github/convertigo/docker/tree/7.5.0-auto"
      - run:
          name: Trigger convertigo-eclipse build
          command: "curl -X POST -u $CIRCLECI_TOKEN: https://circleci.com/api/v1.1/project/github/convertigo/convertigo-eclipse/tree/master"
