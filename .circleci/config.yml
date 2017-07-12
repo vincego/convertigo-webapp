@@ -1,0 +1,22 @@
+version: 2
+jobs:
+  build:
+    docker:
+     - image: convertigo/docker-build:latest
+    working_directory: /mnt
+    environment:
+     - GIT_LFS_SKIP_SMUDGE: 1
+    steps:
+     - checkout
+     - run:
+         name: GIT LFS pull
+         command: git lfs pull
+     - run:
+         name: Gradle build
+         command: ./gradlew $GRADLE_ARGS --parallel --refresh-dependencies publish
+     - run:
+         name: Trigger docker build
+         command: "curl -X POST -u $CIRCLECI_TOKEN: https://circleci.com/api/v1.1/project/github/convertigo/docker/tree/master"
+     - run:
+         name: Trigger convertigo-eclipse build
+         command: "curl -X POST -u $CIRCLECI_TOKEN: https://circleci.com/api/v1.1/project/github/convertigo/convertigo-eclipse/tree/master"
