@@ -38,8 +38,8 @@ publishing {
 
 dependencies {
 	compile 'com.convertigo.engine:convertigo-engine:7.5.0-beta'
-	compileOnly 'org.apache.tomcat.embed:tomcat-embed-core:7.0.78'
-	compileOnly 'org.apache.tomcat:tomcat-dbcp:7.0.78'
+	compileOnly 'org.apache.tomcat.embed:tomcat-embed-core:[7.0,7.1['
+	compileOnly 'org.apache.tomcat:tomcat-dbcp:[7.0,7.1['
 	compileOnly 'org.eclipse.swt:org.eclipse.swt.gtk.linux.x86_64:4.3@jar'
 	compile 'com.convertigo.lib:qrcode:2010.04.22'
 	runtime 'org.mariadb.jdbc:mariadb-java-client:[2,)'
