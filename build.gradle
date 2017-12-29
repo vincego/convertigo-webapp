@@ -2,7 +2,7 @@ apply plugin: 'war'
 apply plugin: 'maven-publish'
 
 group 'com.convertigo.webapp'
-version '7.5.0-beta'
+version '7.5.0'
 
 war {
 	archiveName 'convertigo.war'
@@ -37,7 +37,7 @@ publishing {
 }
 
 dependencies {
-	compile 'com.convertigo.engine:convertigo-engine:7.5.0-beta'
+	compile 'com.convertigo.engine:convertigo-engine:' + project.version
 	compileOnly 'org.apache.tomcat.embed:tomcat-embed-core:[7.0,7.1['
 	compileOnly 'org.apache.tomcat:tomcat-dbcp:[7.0,7.1['
 	compileOnly 'org.eclipse.swt:org.eclipse.swt.gtk.linux.x86_64:4.3@jar'
